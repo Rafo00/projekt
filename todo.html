@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>To do liste</title>
+  <style>
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background-color: #52f612;
+      font-family: Arial, sans-serif;
+      margin: 0;
+    }
+    .container {
+      text-align: center;
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      width: 300px;
+      margin-top: 100px;
+    }
+    ul {
+      list-style: none;
+      padding: 0;
+    }
+    button {
+      margin-left: 10px;
+      background-color: red;
+      color: white;
+      border: none;
+      padding: 5px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .add-btn {
+      background-color: green;
+    }
+    li {
+      background: #ddd;
+      padding: 10px;
+      margin: 5px 0;
+      border-radius: 5px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    input, button {
+      padding: 10px;
+      margin: 5px;
+      border: none;
+      border-radius: 5px;
+    }
+    input {
+      width: 200px;
+      border: 1px solid #ccc;
+    }
+    .add-btn {
+      height: 40px;
+      background: #28a745;
+      color: white;
+      cursor: pointer;
+    }
+    .add-btn:hover {
+      background: #218838;
+    }
+    .delete-btn {
+      background: #dc3545;
+      color: white;
+      cursor: pointer;
+      border: none;
+      padding: 5px 10px;
+      border-radius: 5px;
+    }
+    .delete-btn:hover {
+      width: 70px;
+      height: 50px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    marquee {
+      background: #000000;
+      color: white;
+      font-weight: bold;
+      font-size: 2em;
+      padding: 20px 0;
+      position: fixed;
+      top: 0;
+      width: 100%;
+      z-index: 1000;
+    }
+  </style>
+</head>
+<body>
+
+<marquee>Todo-Liste</marquee>
+
+<div class="container">
+  <h2 class="title">Meine Todo-Liste</h2>
+  <ul id="myTodos"></ul>
+  <input type="text" id="todoField" placeholder="Notiz/en Hinzufügen">
+  <button class="add-btn" onclick="addTodo()">Hinzufügen</button>
+</div>
+
+<script>
+  function saveTodos() {
+    const items = [];
+    document.querySelectorAll('#myTodos li').forEach(li => {
+      items.push(li.firstChild.textContent.trim());
+    });
+    localStorage.setItem('todos', JSON.stringify(items));
+  }
+
+  function loadTodos() {
+    const todos = JSON.parse(localStorage.getItem('todos')) || [];
+    todos.forEach(todo => {
+      createTodoElement(todo);
+    });
+  }
+
+  function createTodoElement(todoText) {
+    const myTodos = document.getElementById('myTodos');
+    const li = document.createElement('li');
+    li.textContent = todoText;
+
+    const deleteBtn = document.createElement('button');
+    deleteBtn.textContent = "Löschen";
+    deleteBtn.className = "delete-btn";
+    deleteBtn.onclick = function () {
+      myTodos.removeChild(li);
+      saveTodos();
+    };
+
+    li.appendChild(deleteBtn);
+    myTodos.appendChild(li);
+  }
+
+  function addTodo() {
+    const todoField = document.getElementById('todoField');
+    const todoText = todoField.value.trim();
+
+    if (todoText !== '') {
+      createTodoElement(todoText);
+      saveTodos();
+      todoField.value = '';
+    }
+  }
+
+  // ENTER-Taste hinzufügen
+  document.getElementById('todoField').addEventListener('keydown', function(event) {
+    if (event.key === 'Enter') {
+      addTodo();
+    }
+  });
+
+  // Beim Laden der Seite: Todos aus localStorage laden
+  window.onload = loadTodos;
+</script>
+
+</body>
+</html>
