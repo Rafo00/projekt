@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EINKAUFSLISTE</title>
+    <style>
+        body {
+            background-color: rgb(255, 0, 76);
+            font-family: Arial, sans-serif;
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-top: 0;
+        }
+
+        .überschrift {
+            text-decoration: underline;
+            text-underline-offset: 8px;
+            text-shadow: 4px 2px 0 black;
+            color: white;
+            text-align: center;
+            margin-top: 20px;
+            margin-bottom: 60px;
+        }
+
+        .eingabe-container {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .schreiben {
+            border: 2px solid black;
+            height: 30px;
+            width: 250px;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        .senden {
+            background-color: white;
+            color: black;
+            border: 2px solid black;
+            height: 42px;
+            width: 100px;
+            cursor: pointer;
+            font-size: 16px;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+
+        .senden:hover {
+            background-color: rgb(0, 236, 118);
+        }
+
+        ul {
+            list-style-type: none;
+            padding: 0;
+            width: 90%;
+            max-width: 500px;
+        }
+
+        li {
+            background-color: white;
+            padding: 10px 15px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        li button {
+            border: none;
+            padding: 5px 10px;
+            cursor: pointer;
+            border-radius: 3px;
+            margin-left: 5px;
+            transition: opacity 0.2s;
+        }
+
+        li button:hover {
+            opacity: 0.7;
+        }
+
+        .bearbeiten {
+            background-color: orange;
+            color: white;
+            margin-left: 20px;
+        }
+
+        .löschen {
+            background-color: red;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <h1 class="überschrift">EINKAUFSLISTE</h1>
+
+    <div class="eingabe-container">
+        <input id="eingabe" class="schreiben" placeholder="Hier schreiben..." type="text">
+        <button id="sendenBtn" class="senden">Senden</button>
+    </div>
+
+    <ul id="liste"></ul>
+
+    <script>
+        const eingabe = document.getElementById('eingabe');
+        const sendenBtn = document.getElementById('sendenBtn');
+        const liste = document.getElementById('liste');
+
+        // Lokalen Speicher laden
+        let items = JSON.parse(localStorage.getItem('einkaufsliste')) || [];
+
+        function saveToLocalStorage() {
+            localStorage.setItem('einkaufsliste', JSON.stringify(items));
+        }
+
+        function renderList() {
+            liste.innerHTML = '';
+            items.forEach((text, index) => {
+                const li = document.createElement('li');
+                li.textContent = text;
+
+                const bearbeitenBtn = document.createElement('button');
+                bearbeitenBtn.textContent = 'Bearbeiten';
+                bearbeitenBtn.classList.add('bearbeiten');
+                bearbeitenBtn.addEventListener('click', () => {
+                    const neuerText = prompt('Bearbeite den Eintrag:', items[index]);
+                    if (neuerText !== null && neuerText.trim() !== '') {
+                        items[index] = neuerText;
+                        saveToLocalStorage();
+                        renderList();
+                    }
+                });
+
+                const löschenBtn = document.createElement('button');
+                löschenBtn.textContent = 'Löschen';
+                löschenBtn.classList.add('löschen');
+                löschenBtn.addEventListener('click', () => {
+                    items.splice(index, 1);
+                    saveToLocalStorage();
+                    renderList();
+                });
+
+                li.appendChild(bearbeitenBtn);
+                li.appendChild(löschenBtn);
+
+                liste.appendChild(li);
+            });
+        }
+
+        function addItem() {
+            const text = eingabe.value.trim();
+            if (text === '') return;
+            items.push(text);
+            saveToLocalStorage();
+            renderList();
+            eingabe.value = '';
+        }
+
+        sendenBtn.addEventListener('click', addItem);
+
+        eingabe.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                addItem();
+            }
+        });
+
+        // Liste beim Laden rendern
+        renderList();
+    </script>
+</body>
+</html>
